@@ -2,6 +2,26 @@ from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
+"""
+    TODO:
+        1. Separate algo and utils from app.py
+        2. Re-structure app and functions
+        3. Make it easier to understand Booth's (Documentation and Logging)
+        4. Output algo steps to webapp ?
+        5. Redesign the UI ? 
+        6. Optimize code
+        7. Steps for others to do this ?
+        8. Better input validation
+        9. pep8
+"""
+
+def get_nbits(n1,n2, default):
+    l1 = len(bin(n1)[2:])
+    l2 = len(bin(n2)[2:])
+    if l1 >= default or l2 >= default:
+        return max(l1, l2) + 1
+    else:
+        return default
 
 def twos_complement(n):
     n2c = []
@@ -50,9 +70,16 @@ def index():
 
 @app.route('/', methods=["POST"])
 def booths_mul():
-    nbits = 16
-    n1 = int(request.form['n1'])
-    n2 = int(request.form['n2'])
+    n1= request.form['n1']
+    n2= request.form['n2']
+    if n1.isdigit() and n2.isdigit():
+        n1 = int(n1)
+        n2 = int(n2)
+    else:
+        return render_template('index.html', result='error: input must be numbers.')
+
+    nbits = get_nbits(n1, n2, default= 64)
+
     # n1 -> multiplicand, n2 -> multiplier
     m, m2c = get_binary_and_2c(n1, nbits)
     b, b2c = get_binary_and_2c(n2, nbits)
@@ -66,12 +93,12 @@ def booths_mul():
         ans2c = twos_complement(ans)
         ans = -1 * int(ans2c, 2)
         op = "" + str(n1) + " x " + str(n2) + " = " + str(ans)
-        return render_template('result.html', results=op)
+        return render_template('index.html', result=op)
     else:
         # positive number
         ans = int(ans, 2)
         op = "" + str(n1) + " x " + str(n2) + " = " + str(ans)
-        return render_template('result.html', results=op)
+        return render_template('index.html', result=op)
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True)
