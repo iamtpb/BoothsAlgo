@@ -73,9 +73,5 @@ def booths_mul():
         op = "" + str(n1) + " x " + str(n2) + " = " + str(ans)
         return render_template('result.html', results=op)
 
-
-import os
-
 if __name__ == '__main__':
-    port = os.getenv('PCAP_APP_PORT', '5000')
-    app.run(host='0.0.0.0', port=int(port))
+    app.run(debug=True, use_reloader=True)
